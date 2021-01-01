@@ -1,0 +1,53 @@
+{
+    "action": {
+        "clientExtra": {},
+        "detailParams": {
+            "sys_text": {
+                "groupName": "",
+                "origin": "2021",
+                "value": "2021"
+            }
+        },
+        "id": "idaction",
+        "name": "스킬 이름",
+        "params": {
+            "sys_text": "2021"
+        }
+    },
+    "bot": {
+        "id": "id",
+        "name": "AjouNotice"
+    },
+    "contexts": [],
+    "intent": {
+        "extra": {
+            "reason": {
+                "code": 1,
+                "message": "OK"
+            }
+        },
+        "id": "idintent",
+        "name": "공지 키워드 검색"
+    },
+    "userRequest": {
+        "block": {
+            "id": "iduserRe",
+            "name": "공지 키워드 검색"
+        },
+        "lang": "kr",
+        "params": {
+            "ignoreMe": "true",
+            "surface": "BuilderBotTest"
+        },
+        "timezone": "Asia/Seoul",
+        "user": {
+            "id": "idUser",
+            "properties": {
+                "botUserKey": "keybot",
+                "bot_user_key": "keybotuser"
+            },
+            "type": "botUserKeyType"
+        },
+        "utterance": "2021 검색\n"
+    }
+}
