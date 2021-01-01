@@ -7,60 +7,66 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Base for nested JSON
-type Base map[string]interface{}
+type Nested map[string]interface{}
 
-// KakaoAction from KakaoJSON
-type KakaoAction struct {
-	ClientExtra  Base
-	DetailParams Base
-	ID           string
-	Name         string
-	Params       Base
+// SimpleText for Kakao Response
+type SimpleText struct {
+	Template struct {
+		Outputs struct {
+			SimpleText struct {
+				Text string `json:"text"`
+			} `json:"simpleText"`
+		} `json:"outputs"`
+	} `json:"template"`
+	Version string `json:"version"`
 }
 
-// KakaoBot from KakaoJSON
-type KakaoBot struct {
-	ID   string
-	Name string
-}
-
-// KakaoUserRequest from KakaoJSON
-type KakaoUserRequest struct {
-	Block     Base
-	Lang      string
-	Params    Base
-	TimeZone  string
-	User      KakaoUser
-	Utterance string
-}
-
-// KakaoUser from KakaoUserRequest.User
-type KakaoUser struct {
-	ID         string
-	Properties Base
-	Type       string
-}
-
-// KakaoIntent from KakaoJSON
-type KakaoIntent struct {
-	Extra KakaoReason
-	ID    string
-	Name  string
-}
-
-// KakaoReason from KakaoIntent.Extra
-type KakaoReason struct {
-	Reason Base
-}
-
-// KakaoJSON is main JSON body from Kakao
+// KakaoJSON request main
 type KakaoJSON struct {
-	Action      KakaoAction      `json:"action" binding:"required"`
-	Bot         KakaoBot         `json:"bot" binding:"required"`
-	Contexts    []interface{}    `json:"contexts" binding:"required"`
-	Intent      KakaoIntent      `json:"intent" binding:"required"`
-	UserRequest KakaoUserRequest `json:"userRequest" binding:"required"`
+	Action struct {
+		ID          string `json:"id"`
+		ClientExtra struct {
+		} `json:"clientExtra"`
+		DetailParams map[string]interface{} `json:"detailParams"`
+		Name         string                 `json:"name"`
+		Params       map[string]interface{} `json:"params"`
+	} `json:"action"`
+	Bot struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"bot"`
+	Contexts []interface{} `json:"contexts"`
+	Intent   struct {
+		ID    string `json:"id"`
+		Extra struct {
+			Reason struct {
+				Code    int64  `json:"code"`
+				Message string `json:"message"`
+			} `json:"reason"`
+		} `json:"extra"`
+		Name string `json:"name"`
+	} `json:"intent"`
+	UserRequest struct {
+		Block struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"block"`
+		Lang   string `json:"lang"`
+		Params struct {
+			IgnoreMe bool   `json:"ignoreMe,string"`
+			Surface  string `json:"surface"`
+		} `json:"params"`
+		Timezone string `json:"timezone"`
+		User     struct {
+			ID         string `json:"id"`
+			Properties struct {
+				BotUserKey  string `json:"botUserKey"`
+				BotUserKey2 string `json:"bot_user_key"`
+			} `json:"properties"`
+			Type string `json:"type"`
+		} `json:"user"`
+		Utterance string `json:"utterance"`
+	} `json:"userRequest"`
 }
 
 // JSONMiddleware is to set all types of requests are JSON.
@@ -82,17 +88,30 @@ func main() {
 	})
 
 	router.POST("/json", func(c *gin.Context) {
-		var json KakaoJSON
-		if err := c.BindJSON(&json); err != nil {
+		var kjson KakaoJSON
+		if err := c.BindJSON(&kjson); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+
 		c.JSON(http.StatusOK,
-			gin.H{"message": fmt.Sprintf("Reason:%v | Params['sys_text']:%v | Utterance:%v | UserID:%v",
-				json.Intent.Extra.Reason["code"],
-				json.Action.Params["sys_text"],
-				json.UserRequest.Utterance,
-				json.UserRequest.User.ID)})
+			gin.H{"json": kjson, "user entered": kjson.UserRequest.Utterance, "params": kjson.Action.Params})
+
+	})
+
+	// SimpleText 만들고 보내는 과정 예제
+	router.POST("/simple", func(c *gin.Context) {
+		var kjson KakaoJSON
+		if err := c.BindJSON(&kjson); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		u := SimpleText{Version: "2.0"}
+		u.Template.Outputs.SimpleText.Text = fmt.Sprintf("Entered: %v", kjson.UserRequest.Utterance)
+
+		c.JSON(http.StatusOK,
+			gin.H{"message": u})
 
 	})
 
