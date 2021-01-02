@@ -7,8 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Nested map[string]interface{}
-
 // SimpleText for Kakao Response
 type SimpleText struct {
 	Template struct {
@@ -102,17 +100,55 @@ func main() {
 	// SimpleText 만들고 보내는 과정 예제
 	router.POST("/simple", func(c *gin.Context) {
 		var kjson KakaoJSON
+		u := SimpleText{Version: "2.0"}
+
 		if err := c.BindJSON(&kjson); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			u.Template.Outputs.SimpleText.Text = err.Error()
+			c.JSON(http.StatusBadRequest, u)
 			return
 		}
 
-		u := SimpleText{Version: "2.0"}
 		u.Template.Outputs.SimpleText.Text = fmt.Sprintf("Entered: %v", kjson.UserRequest.Utterance)
 
 		c.JSON(http.StatusOK,
 			gin.H{"message": u})
+	})
 
+	// ListCard 만들고 보내는 과정 예제
+	router.POST("/card", func(c *gin.Context) {
+		var kjson KakaoJSON
+		if err := c.BindJSON(&kjson); err != nil {
+			errorMsg := SimpleText{Version: "2.0"}
+			errorMsg.Template.Outputs.SimpleText.Text = err.Error()
+			c.JSON(http.StatusBadRequest, errorMsg)
+			return
+		}
+
+		// Card
+		items := []gin.H{}
+		header := gin.H{"title": "header title"}
+
+		// Card items
+		item := gin.H{"title": "card", "description": "desc", "imageUrl": "img", "link": gin.H{"web": "webhref"}}
+		item2 := gin.H{"title": "card2", "description": "desc2"}
+
+		// Add two cards
+		items = append(items, item)
+		items = append(items, item2)
+
+		// QuickReplies [Optional]
+		quickReplies := []gin.H{}
+
+		// Add one quick reply
+		quickReply := gin.H{"messageText": "안녕하세요", "action": "message", "label": "안녕"}
+		quickReplies = append(quickReplies, quickReply)
+
+		// Make a template
+		template := gin.H{"outputs": []gin.H{gin.H{"listCard": gin.H{"header": header, "items": items}}}}
+		template["quickReplies"] = quickReplies // Optional
+		listCard := gin.H{"version": "2.0", "template": template}
+
+		c.JSON(http.StatusOK, listCard)
 	})
 
 	router.Run(":8000")
