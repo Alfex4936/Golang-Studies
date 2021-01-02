@@ -28,6 +28,7 @@ WIN10@DESKTOP:~$ go run KakaoChatBotAPI.go
 ```
 
 ## 카카오 챗봇 JSON
+
 카카오 챗봇 JSON 예제 데이터 
 (utterance = "2021 검색해줘"
 Entity:sys_text = "2021")
@@ -87,6 +88,62 @@ Entity:sys_text = "2021")
 }
 ```
 
+## Golang Nested structs JSON Marshal
+To see how to parse nested struct as Kakao's ListCard JSON, check [ListCardJSON.go](https://github.com/Alfex4936/Golang-Studies/tree/master/html/gin_server/ListCardJSON.go)
+
+!Used [clarketm's json](https://pkg.go.dev/github.com/clarketm/json?utm_source=gopls) package!
+
+JSON result
+```json
+{
+  "template": {
+    "outputs": [
+      {
+        "listCard": {
+          "buttons": [
+            {
+              "label": "hey1",
+              "action": "share"
+            },
+            {
+              "label": "hey2",
+              "action": "share"
+            }
+          ],
+          "header": {
+            "title": "hi"
+          },
+          "items": [
+            {
+              "description": "desc1",
+              "imageUrl": "img",
+              "link": {
+                "web": "web"
+              },
+              "title": "title1"
+            },
+            {
+              "description": "desc2",
+              "title": "title2"
+            }
+          ]
+        }
+      }
+    ],
+    "quickReplies": [
+      {
+        "action": "message",
+        "label": "어제",
+        "messageText": "어제 보여줘"
+      }
+    ]
+  },
+  "version": "2.0"
+}
+```
+
+
+## cURL POST 테스트
 ```console
 WIN10@DESKTOP:~$ curl http://localhost:8000/json -d "@data.json"
 
