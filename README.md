@@ -11,6 +11,10 @@
 
 </div>
 
+## 정렬 알고리즘 (Sorting algorithms)
+
+[Algorithm 이동](https://github.com/Alfex4936/Golang-Studies/tree/master/algorithm)
+
 ## 대학교 공지 HTML 파서 예제
 
 [Parser.go로 이동하기](https://github.com/Alfex4936/Golang-Studies/blob/master/html/parser/AjouNoticeParser.go)
