@@ -30,5 +30,7 @@ func main() {
 	a := A{}
 	b := B{}
 
-	Call(a, b)
+	var c Duck = A{}
+
+	Call(a, b, c)
 }
